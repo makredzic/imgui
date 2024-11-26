@@ -2,8 +2,7 @@ project(
     'imgui',
     'cpp',
     license: 'MIT',
-    version: '1.89.9',
-    meson_version: '>=0.50.0',
+    version: '1.89.9'
 )
 
 if host_machine.system() == 'darwin'
@@ -80,8 +79,17 @@ if cpp.has_header('webgpu/webgpu.h', required: get_option('webgpu'))
     sources += 'backends/imgui_impl_wgpu.cpp'
 endif
 
+
 # platform backends
-glfw_dep = dependency('glfw3', required: get_option('glfw'))
+
+# allow_fallback will check the subprojects folder for a local installation
+# of the dependency if one isn't found on the system
+# this option was enabled for glfw because my personal project
+# used a subproject with precompiled glfw libs instead of a system-wide installed one
+# This option could be enabled for all deps to allow developers to do the same thing
+# for any other dependency
+# src: https://mesonbuild.com/Reference-manual_functions.html#dependency_allow_fallback
+glfw_dep = dependency('glfw3', required: get_option('glfw'), allow_fallback: true)
 if glfw_dep.found()
     sources += 'backends/imgui_impl_glfw.cpp'
     dependencies += glfw_dep
